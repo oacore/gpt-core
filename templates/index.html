@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+    <link rel="stylesheet" href="static/css/index.css">
+    <title>CORE-GPT Demo</title>
+
+</head>
+<body>
+<main>
+    <img class="header-image" src="static/images/CORE-GPT.png" alt="CORE-GPT"/>
+    <div class="questionBox">
+        <input id="q" type="text" placeholder="What do you want to know today?"/>
+    </div>
+    <img id="loading" src="static/images/loading.gif" alt="A loading image" style="display: none"/>
+    <div id="answerBox">
+        <i class="lineUp"> This is the start of your questions with CORE-GPT. You can start by asking questions like: Are COVID
+            vaccines successful? What are the limitations of Bibliometrics? Is smoking a cause for asthma?</i>
+
+    </div>
+</main>
+<script>
+
+    document.addEventListener("keydown", function (e) {
+        console.log(e.keyCode)
+        e = e;
+        if (e.keyCode == 13) {
+            doSearch()
+        }
+    });
+
+    document.getElementById("submit").addEventListener("click", function (e) {
+        doSearch();
+    })
+
+    function doSearch() {
+        let q = document.getElementById("q").value;
+        console.log("search " + q)
+        const params = {
+            q: q
+        };
+        document.getElementById("loading").style.display = "block";
+        document.getElementById("q").value = "Searching...";
+        fetch('/ask?q=' + q)
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById("q").value = "";
+                document.getElementById("loading").style.display = "none"
+                document.getElementById("answerBox").innerHTML = "<div class='question'>" + capitalizeFirstLetter(q) + "</div><div class='answer lineUp'>"+data+"</div>" + document.getElementById("answerBox").innerHTML;
+            });
+    }
+
+    function capitalizeFirstLetter(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
+
+
+
+</script>
+</body>

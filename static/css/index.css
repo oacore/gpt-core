@@ -1,0 +1,76 @@
+body {
+    margin-left: 15%;
+    margin-right: 15%;
+    margin-top:50px;
+    text-align: center;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+}
+
+.questionBox {
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
+
+#loading {
+    margin:auto;
+}
+
+.questionBox input[type='text']{
+    width:70%;
+    font-size: 2rem;
+    border-radius: 2px;
+    cursor: text;
+    border: solid 2px #b75400;
+    caret-color: #b75400;
+    padding:5px;
+}
+
+#answerBox{
+    margin-top: 50px;
+    font-size: 1rem;
+    text-align: left;
+}
+.header-image {
+    max-height: 400px;
+}
+
+.answerBox {
+    text-align: right;
+}
+
+#answerBox .question {
+    background-color: #eee;
+    font-style: italic;
+    margin-top: 25px;
+    border-left: solid 4px #b75400;
+    padding: 15px 10px;
+    border-radius: 1px;
+}
+
+#answerBox .answer {
+    margin-left: 15px;
+    margin-top:25px;
+    margin-bottom: 25px;
+}
+
+/* lineup class and keyframes */
+.lineUp {
+  animation: 2s anim-lineUp ease-out;
+}
+@keyframes anim-lineUp {
+  0% {
+    opacity: 0;
+    transform: translateY(80%);
+  }
+  20% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(0%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0%);
+  }
+}
