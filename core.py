@@ -7,7 +7,7 @@ import time
 import urllib.parse
 
 api_key = "***REMOVED***"
-limit = 5
+limit = 10
 
 
 def query_api(search_url, query, scroll=False, scrollId=None):
@@ -48,10 +48,13 @@ def search_works(search_query):
     if "results" not in response:
         raise "Sorry, no results in CORE for your query."
     print(len(response["results"]))
-    titles=[]
+    titles = []
+
     for hit in response["results"]:
-        search_results.append({"url": f"https://core.ac.uk/works/{hit['id']}", "abstract": f"{hit['abstract'][:800]}"})
-        titles.append(hit["title"])
-    if "results" not in response:
-        raise "Sorry, no results in CORE for your query."
+        if hit["title"] not in titles:
+            searsdch_results.append({"url": f"https://core.ac.uk/works/{hit['id']}", "abstract": f"{hit['abstract'][:800]}"})
+            titles.append(hit["title"])
+        if len(titles) >= 5:
+            break
+
     return titles, search_results
