@@ -8,9 +8,10 @@ openai = "*"
 requests = "*"
 python-dateutil = "*"
 flask = "*"
+waitress = "*"
 
 [dev-packages]
 
 [requires]
 python_version = "3.9"
-python_full_version = "3.9.6"
+python_full_version = "3.9.1"

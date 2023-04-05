@@ -3,6 +3,7 @@ from core import search_works
 import re
 from flask import *
 import urllib.parse
+import os
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
 
@@ -70,4 +71,8 @@ def ask():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    if os.getenv("debug"):
+        app.run(debug=True)
+    else:
+        from waitress import serve
+        serve(app, host="0.0.0.0", port=5005)
