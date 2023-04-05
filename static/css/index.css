@@ -53,6 +53,10 @@ body {
     margin-bottom: 25px;
 }
 
+.repeatLink{
+    float:right;
+}
+
 /* lineup class and keyframes */
 .lineUp {
   animation: 2s anim-lineUp ease-out;
