@@ -13,8 +13,34 @@
     </div>
     <img id="loading" src="static/images/loading.gif" alt="A loading image" style="display: none"/>
     <div id="answerBox">
-        <i class="lineUp"> This is the start of your questions with CORE-GPT. You can start by asking questions like: Are COVID
+        <i class="lineUp"> This is the start of your questions with CORE-GPT. You can start by asking questions like:
+            Are COVID
             vaccines successful? What are the limitations of Bibliometrics? Is smoking a cause for asthma?</i>
+        <div class="disclaimer">
+            <ul>
+                <li> This is an internal version of CORE-GPT. The final version will be integrated on <a href="https://core.ac.uk">the CORE website</a> alongside the usual search.
+                </li>
+                <li> We use OpenAI CHAT-GPT 4 to search the CORE dataset and then generate an answer using the search
+                    results as context.
+                </li>
+                <li>We reduce the hallucinations by asking Chat-GPT to stick to the CORE search results, however,
+                    hallucinations are still possible, especially when there are not enough relevant results from CORE.
+                </li>
+                <li>The quality of the answers depends on what we can find in the CORE data, you are searching through nearly 300 million
+                    Open Access research papers (<a href="https://core.ac.uk/data">see the data page</a> for details), therefore you will get a better quality answer if you inquire about an
+                    academic topic rather than asking for a recipe.
+                </li>
+                <li>Sometimes the CORE search results are not able to provide an answer and usually Core GPT will
+                    recognise that.
+                </li>
+                <li>The results are generated every time, so if you don’t like the answer you can try to click 'ask again'
+                    to see if you will get a better response.
+                </li>
+                <li>This is just a small answer to your question while there's way more research to explore! We
+                    encourage you to read the papers listed and click the 'show more' link to continue your research.
+                </li>
+            </ul>
+        </div>
 
     </div>
 </main>
@@ -40,20 +66,18 @@
             .then(data => {
                 document.getElementById("q").value = "";
                 document.getElementById("loading").style.display = "none"
-                document.getElementById("answerBox").innerHTML = "<div class='question'>" + capitalizeFirstLetter(q) + "<a class='repeatLink' href='#' onclick='repeatSearch(\""+q+"\")'>Ask again</a> </div><div class='answer lineUp'>"+data+"</div>" + document.getElementById("answerBox").innerHTML;
+                document.getElementById("answerBox").innerHTML = "<div class='question'>" + capitalizeFirstLetter(q) + "<a class='repeatLink' href='#' onclick='repeatSearch(\"" + q + "\")'>Ask again</a> </div><div class='answer lineUp'>" + data + "</div>" + document.getElementById("answerBox").innerHTML;
             });
     }
 
-    function repeatSearch(q){
-        document.getElementById("q").value=q;
+    function repeatSearch(q) {
+        document.getElementById("q").value = q;
         doSearch();
     }
 
     function capitalizeFirstLetter(string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
     }
-
-
 
 
 </script>
