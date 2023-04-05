@@ -40,7 +40,7 @@
         };
         document.getElementById("loading").style.display = "block";
         document.getElementById("q").value = "Searching...";
-        fetch('/ask?q=' + q)
+        fetch('ask?q=' + q)
             .then(response => response.text())
             .then(data => {
                 document.getElementById("q").value = "";
