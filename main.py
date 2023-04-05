@@ -4,6 +4,7 @@ import re
 from flask import *
 import urllib.parse
 import os
+from flask import request
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
 
@@ -45,6 +46,23 @@ def render_response(answer, search_results, titles, search_query):
     return replace_url_to_link(clearup_response(answer, search_results)) + replace_url_to_link(references) + core_link
 
 
+def render_json_response(answer, search_results, titles, search_query):
+    i = 1
+    references = {}
+    search_query_for_web = urllib.parse.quote(f"{search_query} and _exists_:description")
+    for a in search_results:
+        references[i] = a
+        i += 1
+    core_link = f"https://core.ac.uk/search?q={search_query_for_web}"
+    answer = clearup_response(answer, search_results)
+
+    return {
+        "answer": answer,
+        "results": references,
+        "see_more": core_link
+    }
+
+
 def run(input_request):
     search_query = generate_search_query(input_request)
     print(f"Searching core with: {search_query}")
@@ -52,9 +70,12 @@ def run(input_request):
     titles, search_results = search_works(search_query)
 
     if len(search_results) == 0:
-        raise Exception("not enough core results")
+        return "Not enough CORE results"
 
     answer = generate_answer(input_request, search_results)
+    accept_header = request.headers.get('Accept')
+    if accept_header and "json" in accept_header:
+        return render_json_response(answer, search_results, titles, search_query)
     return render_response(answer, search_results, titles, search_query)
 
 
@@ -75,4 +96,5 @@ if __name__ == "__main__":
         app.run(debug=True)
     else:
         from waitress import serve
+
         serve(app, host="0.0.0.0", port=5005)
