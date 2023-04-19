@@ -52,7 +52,7 @@ def search_works(search_query):
 
     for hit in response["results"]:
         if hit["title"] not in titles:
-            search_results.append({"url": f"https://core.ac.uk/works/{hit['id']}", "abstract": f"{hit['abstract'][:800]}"})
+            search_results.append({"url": f"https://core.ac.uk/works/{hit['id']}", "abstract": f"{hit['abstract'][:800]}", "title": hit["title"]})
             titles.append(hit["title"])
         if len(titles) >= 5:
             break
