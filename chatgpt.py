@@ -3,8 +3,8 @@ import json
 
 ***REMOVED***
 #ou key for gpt 4
-***REMOVED***
-
+#***REMOVED***
+model = "gpt-3.5-turbo"
 def generate_search_query(input_request):
     messages = [
         {"role": "system", "content": "Generate a search engine query for a research paper based on the question. "
@@ -15,7 +15,7 @@ def generate_search_query(input_request):
         {"role": "user", "content": f"{input_request}"},
     ]
     response = openai.ChatCompletion.create(
-        model="gpt-4",
+        model=model,
         messages=messages
     )
     return response["choices"][0]["message"]["content"].replace("\"", "").replace(":", "")
@@ -41,7 +41,7 @@ def generate_answer(input_request, search_results):
 
     print(messages)
     finalResponse = openai.ChatCompletion.create(
-        model="gpt-4",
+        model=model,
         messages=messages
     )
     return finalResponse["choices"][0]["message"]["content"]
@@ -66,7 +66,7 @@ def generate_course_material(input_request, search_results):
 
     print(messages)
     finalResponse = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+        model=model,
         messages=messages
     )
     return finalResponse["choices"][0]["message"]["content"]
