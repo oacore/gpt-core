@@ -1,10 +1,22 @@
 import openai
 import json
 
-***REMOVED***
+AZURE_OPENAI_API_KEY="***REMOVED***"
+AZURE_OPENAI_API_BASE="https://lxt-aimwa-openai-dev-us.openai.azure.com/"
+AZURE_OPENAI_API_VERSION="2023-05-15"
+
+#***REMOVED***
+
+openai.api_type="azure"
+
+openai.api_version=AZURE_OPENAI_API_VERSION
+
+openai.api_base=AZURE_OPENAI_API_BASE
+
+openai.api_key=AZURE_OPENAI_API_KEY
 #ou key for gpt 4
 #***REMOVED***
-model = "gpt-3.5-turbo"
+engine = "lxt-aimwa-dev-gpt4-us"
 def generate_search_query(input_request):
     messages = [
         {"role": "system", "content": "Generate a search engine query for a research paper based on the question. "
@@ -15,8 +27,9 @@ def generate_search_query(input_request):
         {"role": "user", "content": f"{input_request}"},
     ]
     response = openai.ChatCompletion.create(
-        model=model,
-        messages=messages
+        messages=messages,
+        engine=engine
+
     )
     return response["choices"][0]["message"]["content"].replace("\"", "").replace(":", "")
 
@@ -39,9 +52,11 @@ def generate_answer(input_request, search_results):
         {"role": "assistant", "content": f"{json.dumps(search_results)}"}
     ]
 
+
+
     print(messages)
     finalResponse = openai.ChatCompletion.create(
-        model=model,
+        engine=engine,
         messages=messages
     )
     return finalResponse["choices"][0]["message"]["content"]
@@ -66,7 +81,7 @@ def generate_course_material(input_request, search_results):
 
     print(messages)
     finalResponse = openai.ChatCompletion.create(
-        model=model,
+        engine=engine,
         messages=messages
     )
     return finalResponse["choices"][0]["message"]["content"]
