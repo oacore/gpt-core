@@ -1,11 +1,11 @@
+import os
 import openai
 import json
 
-AZURE_OPENAI_API_KEY = "***REMOVED***"
+AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_KEY")
 AZURE_OPENAI_API_BASE = "https://lxt-aimwa-openai-dev-us.openai.azure.com/"
 AZURE_OPENAI_API_VERSION = "2023-05-15"
 
-# ***REMOVED***
 
 openai.api_type = "azure"
 
@@ -13,9 +13,8 @@ openai.api_version = AZURE_OPENAI_API_VERSION
 
 openai.api_base = AZURE_OPENAI_API_BASE
 
-***REMOVED***
+openai.api_key = AZURE_OPENAI_API_KEY
 # ou key for gpt 4
-# ***REMOVED***
 engine = "lxt-aimwa-dev-gpt4-us"
 
 

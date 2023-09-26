@@ -1,3 +1,5 @@
+import os
+
 import requests
 
 import dateutil.parser
@@ -6,7 +8,7 @@ import requests
 import time
 import urllib.parse
 
-api_key = "***REMOVED***"
+api_key = os.getenv("CORE_API_KEY")
 limit = 10
 
 
