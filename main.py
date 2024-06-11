@@ -5,6 +5,8 @@ from flask import *
 import urllib.parse
 import os
 from flask import request
+import sys
+from langchain_community.llms import Bedrock
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
 
@@ -73,9 +75,7 @@ def run(input_request):
         return "Not enough CORE results"
 
     answer = generate_answer(input_request, search_results)
-    accept_header = request.headers.get('Accept')
-    if accept_header and "json" in accept_header:
-        return render_json_response(answer, search_results, titles, search_query)
+
     return render_response(answer, search_results, titles, search_query)
 
 
@@ -92,9 +92,5 @@ def ask():
 
 
 if __name__ == "__main__":
-    if os.getenv("debug"):
-        app.run(debug=True)
-    else:
-        from waitress import serve
-
-        serve(app, host="0.0.0.0", port=5005)
+    question = sys.argv[1]
+    print(run(question))

@@ -1,45 +1,40 @@
 import os
-import openai
+
 import json
+from langchain_community.chat_models import BedrockChat
 
-AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_KEY")
-AZURE_OPENAI_API_BASE = "https://lxt-aimwa-openai-dev-us.openai.azure.com/"
-AZURE_OPENAI_API_VERSION = "2023-05-15"
+model_kwargs = {  # AI21
+    "maxTokens": 4096
+}
 
+llm = BedrockChat(  # create a Bedrock llm client
+    model_id="anthropic.claude-3-sonnet-20240229-v1:0"  # set the foundation model
+)
 
-openai.api_type = "azure"
-
-openai.api_version = AZURE_OPENAI_API_VERSION
-
-openai.api_base = AZURE_OPENAI_API_BASE
-
-openai.api_key = AZURE_OPENAI_API_KEY
-# ou key for gpt 4
-engine = "lxt-aimwa-dev-gpt4-us"
+llm.model_kwargs = {
+    'max_tokens': 16000,
+}
 
 
 def generate_search_query(input_request):
     messages = [
-        {"role": "system", "content": "You are a helpful search assistant that can provide information."},
         {"role": "user", "content": "Generate a search engine query for a research paper based on the question. "
                                     "Prioritise the most important keywords and add synonyms to focus the search. "
                                     "Ensure that the response contain only the query and no other extra text"
                                     "The answer should be no longer than "
                                     "80 words."},
-        {"role": "user", "content": f"{input_request}"},
+        {"role": "assistant", "content": f"{input_request}"},
     ]
-    response = openai.ChatCompletion.create(
-        messages=messages,
-        engine=engine
 
-    )
-    return response["choices"][0]["message"]["content"].replace("\"", "").replace(":", "")
+    response = llm.invoke(messages)
+    print("results")
+    response_body = response.content.replace("\n", "").replace("\"", " ")
+    return response_body
 
 
 def generate_answer(input_request, search_results):
     global final_answer
     messages = [
-        {"role": "system", "content": "You are a helpful search assistant that can provide information."},
         {"role": "user", "content": "Generate a comprehensive answer (but no more than 160 words) "
                                     "for a given question solely based on the provided search results in the format: "
                                     "{url:$url, abstract:$abstract}. "
@@ -51,16 +46,14 @@ def generate_answer(input_request, search_results):
                                     "cite the most relevant result that answer the question "
                                     "accurately. If different results refer to different entities with the same "
                                     "name, write separate answers for each entity."},
-        {"role": "user", "content": f"{input_request}"},
-        {"role": "assistant", "content": f"{json.dumps(search_results)}"}
+        {"role": "assistant", "content": f"{input_request}"},
+        {"role": "user", "content": f"{json.dumps(search_results)}"}
     ]
 
-    print(messages)
-    finalResponse = openai.ChatCompletion.create(
-        engine=engine,
-        messages=messages
-    )
-    return finalResponse["choices"][0]["message"]["content"]
+    response = llm.invoke(messages)  # return a response to the prompt
+    response_body = response.content
+
+    return response_body
 
 
 def generate_course_material(input_request, search_results):
@@ -81,9 +74,7 @@ def generate_course_material(input_request, search_results):
         {"role": "assistant", "content": f"{json.dumps(search_results)}"}
     ]
 
-    print(messages)
-    finalResponse = openai.ChatCompletion.create(
-        engine=engine,
-        messages=messages
-    )
-    return finalResponse["choices"][0]["message"]["content"]
+    response = llm.invoke(messages)  # return a response to the prompt
+    response_body = response.content
+
+    return response_body
