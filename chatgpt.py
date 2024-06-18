@@ -28,12 +28,12 @@ def generate_search_query(input_request):
                                     "80 words."},
         {"role": "user", "content": f"{input_request}"},
     ]
-    response = openai.ChatCompletion.create(
+    response = openai.chat.completions.create(
         messages=messages,
-        engine=engine
+        model=engine
 
     )
-    return response["choices"][0]["message"]["content"].replace("\"", "").replace(":", "")
+    return response.choices[0].message.content.replace("\"", "").replace(":", "")
 
 
 def generate_answer(input_request, search_results):
@@ -56,12 +56,73 @@ def generate_answer(input_request, search_results):
     ]
 
     print(messages)
-    finalResponse = openai.ChatCompletion.create(
-        engine=engine,
-        messages=messages
-    )
-    return finalResponse["choices"][0]["message"]["content"]
+    finalResponse = openai.chat.completions.create(
+        messages=messages,
+        model=engine
 
+    )
+    return finalResponse.choices[0].message.content
+
+
+def generate_local_answer(input_request, search_results):
+    messages = [
+        {"role": "user", "content": "Generate a comprehensive summary (but no more than 160 words) "
+                                    "for a given question solely based on the provided search results in the format: "
+                                    "{url:$url, abstract:$abstract, authors:$authors}. "
+                                    "The search results are coming from a single institution, "
+                                    "The user asking the question is coming from the same institution so the answer "
+                                    "need to be phrased on what is the best way that internal research can be used to "
+                                    "answer the question, "
+                                    "Please mention at the start that the results are coming from the institution of "
+                                    "the user "
+                                    "You must only use information from the provided search results. "
+                                    "Use an unbiased and journalistic tone. Combine search results together "
+                                    "into a coherent answer. "
+                                    "Do not repeat text. Cite search results using the url provided and the [N] "
+                                    "notation. Only "
+                                    "cite the most relevant result that answer the question "
+                                    "accurately. If different results refer to different entities with the same "
+                                    "name, write separate answers for each entity."},
+        {"role": "assistant", "content": f"{input_request}"},
+        {"role": "user", "content": f"{json.dumps(search_results)}"}
+    ]
+    print(messages)
+    finalResponse = openai.chat.completions.create(
+        messages=messages,
+        model=engine
+
+    )
+    return finalResponse.choices[0].message.content
+
+def generate_overall_answer(input_request, search_results):
+    messages = [
+        {"role": "user", "content": "Generate a comprehensive summary (but no more than 300 words) "
+                                    "for a given question solely based on the provided search results in the format: "
+                                    "{url:$url, abstract:$abstract, authors:$authors, provenance:$provenance}. "
+                                    "The results with local provenance are coming from the user institution, "
+                                    "The answer should take the provenance into account and highlight more the local "
+                                    "results "
+                                    "please mention the provenance when describing the results"
+                                    "please emphasise the provenance of each result in your text, if the citation is "
+                                    "for a local paper you must mention it "
+                                    "You must only use information from the provided search results. "
+                                    "Use an unbiased and journalistic tone. Combine search results together "
+                                    "into a coherent answer. "
+                                    "Do not repeat text. Cite search results using the url provided and the [N] "
+                                    "notation. Only "
+                                    "cite that answer the question based on relevancy and provenance"
+                                    "accurately. If different results refer to different entities with the same "
+                                    "name, write separate answers for each entity."},
+        {"role": "assistant", "content": f"{input_request}"},
+        {"role": "user", "content": f"{json.dumps(search_results)}"}
+    ]
+    print(messages)
+    finalResponse = openai.chat.completions.create(
+        messages=messages,
+        model=engine
+
+    )
+    return finalResponse.choices[0].message.content
 
 def generate_course_material(input_request, search_results):
     global final_answer
@@ -82,8 +143,9 @@ def generate_course_material(input_request, search_results):
     ]
 
     print(messages)
-    finalResponse = openai.ChatCompletion.create(
-        engine=engine,
-        messages=messages
+    finalResponse = openai.chat.completions.create(
+        messages=messages,
+        model=engine
+
     )
-    return finalResponse["choices"][0]["message"]["content"]
+    return finalResponse.choices[0].message.content

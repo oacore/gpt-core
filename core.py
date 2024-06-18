@@ -54,7 +54,32 @@ def search_works(search_query):
 
     for hit in response["results"]:
         if hit["title"] not in titles:
-            search_results.append({"url": f"https://core.ac.uk/works/{hit['id']}", "abstract": f"{hit['abstract'][:800]}", "title": hit["title"]})
+            search_results.append(
+                {"url": f"https://core.ac.uk/works/{hit['id']}", "abstract": f"{hit['abstract'][:800]}",
+                 "title": hit["title"], "authors": hit["authors"], "provenance":"global"})
+            titles.append(hit["title"])
+        if len(titles) >= 5:
+            break
+
+    return titles, search_results
+
+
+def search_works_bydataprovider(search_query, dataProviderId):
+    response, elapsed = query_api("https://api.core.ac.uk/v3/search/works",
+                                  urllib.parse.quote(
+                                      f"{search_query} and _exists_:description and dataProviders:{dataProviderId}"))
+    search_results = []
+    if "results" not in response:
+        raise "Sorry, no results in CORE for your query."
+    print(len(response["results"]))
+    titles = []
+
+    for hit in response["results"]:
+        if hit["title"] not in titles:
+            search_results.append(
+                {"url": f"https://core.ac.uk/works/{hit['id']}", "abstract": f"{hit['abstract'][:800]}",
+                 "title": hit["title"],
+                 "authors": hit["authors"], "provenance":"local"})
             titles.append(hit["title"])
         if len(titles) >= 5:
             break

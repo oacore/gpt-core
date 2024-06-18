@@ -10,6 +10,7 @@
     <img class="header-image" src="static/images/CORE-GPT.png" alt="CORE-GPT"/>
     <div class="questionBox">
         <input id="q" type="text" placeholder="What do you want to know today?"/>
+        <input id="repo" type="text" placeholder="Data provider ID?"/>
     </div>
     <img id="loading" src="static/images/loading.gif" alt="A loading image" style="display: none"/>
     <div id="answerBox">
@@ -59,9 +60,10 @@
         const params = {
             q: q
         };
+         let repo = document.getElementById("repo").value;
         document.getElementById("loading").style.display = "block";
         document.getElementById("q").value = "Searching...";
-        fetch('ask?q=' + q)
+        fetch('askLocal?q=' + q + "&repo=" + repo)
             .then(response => response.text())
             .then(data => {
                 document.getElementById("q").value = "";
