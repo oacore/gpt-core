@@ -81,6 +81,8 @@ def generate_local_answer(input_request, search_results):
                                     "You must only use information from the provided search results. "
                                     "Use an unbiased and journalistic tone. Combine search results together "
                                     "into a coherent answer. "
+                                    "If more than one search results have the same author, mention the author as a "
+                                    "relevant researcher to asnwer the question. "
                                     "Do not repeat text. Cite search results using the url provided and the [N] "
                                     "notation. Only "
                                     "cite the most relevant result that answer the question "
