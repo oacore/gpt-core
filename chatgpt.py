@@ -6,12 +6,11 @@ AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_KEY")
 AZURE_OPENAI_API_BASE = "https://lxt-aimwa-openai-dev-us.openai.azure.com/"
 AZURE_OPENAI_API_VERSION = "2023-05-15"
 
-
 openai.api_type = "azure"
 
 openai.api_version = AZURE_OPENAI_API_VERSION
 
-openai.api_base = AZURE_OPENAI_API_BASE
+openai.azure_endpoint = AZURE_OPENAI_API_BASE
 
 openai.api_key = AZURE_OPENAI_API_KEY
 # ou key for gpt 4
@@ -66,7 +65,9 @@ def generate_answer(input_request, search_results):
 
 def generate_local_answer(input_request, search_results):
     messages = [
-        {"role": "user", "content": "Generate a comprehensive summary (but no more than 160 words) "
+        {"role": "user", "content": "You are an assistant helping the research office understands what research "
+                                    "has been done for the topic in the query"
+                                    "Generate a comprehensive overview of the research in the institution "
                                     "for a given question solely based on the provided search results in the format: "
                                     "{url:$url, abstract:$abstract, authors:$authors}. "
                                     "The search results are coming from a single institution, "
@@ -75,6 +76,8 @@ def generate_local_answer(input_request, search_results):
                                     "answer the question, "
                                     "Please mention at the start that the results are coming from the institution of "
                                     "the user "
+                                    "You must only use information from the provided search results, please use also "
+                                    "the authors surname in the answer "
                                     "You must only use information from the provided search results. "
                                     "Use an unbiased and journalistic tone. Combine search results together "
                                     "into a coherent answer. "
@@ -94,9 +97,11 @@ def generate_local_answer(input_request, search_results):
     )
     return finalResponse.choices[0].message.content
 
+
 def generate_overall_answer(input_request, search_results):
     messages = [
         {"role": "user", "content": "Generate a comprehensive summary (but no more than 300 words) "
+                                    "with a comparison between local and global results (but no more than 160 words) "
                                     "for a given question solely based on the provided search results in the format: "
                                     "{url:$url, abstract:$abstract, authors:$authors, provenance:$provenance}. "
                                     "The results with local provenance are coming from the user institution, "
@@ -105,11 +110,12 @@ def generate_overall_answer(input_request, search_results):
                                     "please mention the provenance when describing the results"
                                     "please emphasise the provenance of each result in your text, if the citation is "
                                     "for a local paper you must mention it "
-                                    "You must only use information from the provided search results. "
+                                    "You must only use information from the provided search results, please use also "
+                                    "the authors surname in the answer "
                                     "Use an unbiased and journalistic tone. Combine search results together "
                                     "into a coherent answer. "
-                                    "Do not repeat text. Cite search results using the url provided and the [N] "
-                                    "notation. Only "
+                                    "Do not repeat text. Cite search results using the authors names provided, the [N] "
+                                    "notation and the $provenance variable. Only "
                                     "cite that answer the question based on relevancy and provenance"
                                     "accurately. If different results refer to different entities with the same "
                                     "name, write separate answers for each entity."},
@@ -123,6 +129,7 @@ def generate_overall_answer(input_request, search_results):
 
     )
     return finalResponse.choices[0].message.content
+
 
 def generate_course_material(input_request, search_results):
     global final_answer

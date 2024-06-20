@@ -39,11 +39,21 @@ def render_response(answer, search_results, titles, search_query):
     references = "<ol>"
     search_query_for_web = urllib.parse.quote(f"{search_query} and _exists_:description")
     for a in search_results:
-        references += f" <li> {a['url']} - {titles[i]}</li>"
+        references += f" <li> {a['url']} - {titles[i]} - {flatten_authors(a['authors'])}</li>"
         i += 1
     references += "</ol>"
     core_link = f"<br><a href='https://core.ac.uk/search?q={search_query_for_web}'>See more in CORE</a>"
     return replace_url_to_link(clearup_response(answer, search_results)) + replace_url_to_link(references) + core_link
+
+
+def flatten_authors(authors):
+    authors_string=""
+    if isinstance(authors, list):
+        for author in authors:
+            authors_string += author["name"] + "; "
+        return authors_string
+    else:
+        return "-"
 
 
 def render_local_response(answer, search_results, titles, search_query):
@@ -51,7 +61,7 @@ def render_local_response(answer, search_results, titles, search_query):
     references = "<ol>"
     search_query_for_web = urllib.parse.quote(f"{search_query} and _exists_:description")
     for a in search_results:
-        references += f" <li> {a['url']} - {titles[i]}</li>"
+        references += f" <li> {a['url']} - {titles[i]} - {flatten_authors(a['authors'])}</li>"
         i += 1
     references += "</ol>"
     core_link = f"<br><a href='https://core.ac.uk/search?q={search_query_for_web}'>See more in CORE</a>"
@@ -108,10 +118,11 @@ def runRepo(input_request, dataProviderId):
     answer = generate_answer(input_request, search_results)
     local_answer = generate_local_answer(input_request, local_search_results)
 
-    overall_answer = generate_overall_answer(input_request, search_results + local_search_results)
+    overall_answer = generate_overall_answer(input_request,  local_search_results+search_results)
     return "LOCAL:<br>" + render_local_response(local_answer, local_search_results, local_titles, search_query) \
            + "<br> GLOBAL <BR>" + render_response(answer, search_results, titles, search_query) \
-           + "<br> OVERALL: <br>" + render_response(overall_answer, search_results + local_search_results, local_titles+titles, search_query)
+           + "<br> OVERALL: <br>" + render_response(overall_answer,  local_search_results + search_results,
+                                                    local_titles + titles, search_query)
 
 
 @app.route("/")
