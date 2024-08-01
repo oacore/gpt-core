@@ -8,7 +8,9 @@ model_kwargs = {  # AI21
 }
 
 llm = BedrockChat(  # create a Bedrock llm client
-    model_id="anthropic.claude-3-sonnet-20240229-v1:0"  # set the foundation model
+    model_id="anthropic.claude-3-haiku-20240307-v1:0",  # set the foundation model
+    region_name="eu-central-1",
+    credentials_profile_name='bedrock-personal'
 )
 
 llm.model_kwargs = {
@@ -49,7 +51,7 @@ def generate_answer(input_request, search_results):
         {"role": "assistant", "content": f"{input_request}"},
         {"role": "user", "content": f"{json.dumps(search_results)}"}
     ]
-
+    print(json.dumps(messages))
     response = llm.invoke(messages)  # return a response to the prompt
     response_body = response.content
 

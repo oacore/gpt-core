@@ -92,5 +92,9 @@ def ask():
 
 
 if __name__ == "__main__":
-    question = sys.argv[1]
-    print(run(question))
+    if os.getenv("debug"):
+        app.run(debug=True)
+    else:
+        from waitress import serve
+
+        serve(app, host="0.0.0.0", port=5005)
