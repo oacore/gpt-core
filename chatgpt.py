@@ -1,14 +1,15 @@
 import os
 
 import json
-from langchain_community.chat_models import BedrockChat
+from langchain_aws import ChatBedrock
+import re
 
 model_kwargs = {  # AI21
     "maxTokens": 4096
 }
 
-llm = BedrockChat(  # create a Bedrock llm client
-    model_id="anthropic.claude-3-haiku-20240307-v1:0",  # set the foundation model
+llm = ChatBedrock(
+    model_id="anthropic.claude-3-sonnet-20240229-v1:0",  # set the foundation model
     region_name="eu-central-1",
     credentials_profile_name='bedrock-personal'
 )
@@ -20,17 +21,20 @@ llm.model_kwargs = {
 
 def generate_search_query(input_request):
     messages = [
-        {"role": "user", "content": "Generate a search engine query for a research paper based on the question. "
+        {"role": "system", "content": "You are a helpful search assistant that can provide information."},
+        {"role": "user", "content": "Generate a keyword search engine query for a research paper based on the question. "
                                     "Prioritise the most important keywords and add synonyms to focus the search. "
                                     "Ensure that the response contain only the query and no other extra text"
+                                    " avoid using too many brackets and extra shortcuts such as site:"
                                     "The answer should be no longer than "
                                     "80 words."},
-        {"role": "assistant", "content": f"{input_request}"},
+        {"role": "user", "content": f"{input_request}"},
     ]
 
     response = llm.invoke(messages)
     print("results")
     response_body = response.content.replace("\n", "").replace("\"", " ")
+    response_body = re.sub("\s\s+", " ", response_body)
     return response_body
 
 
@@ -47,7 +51,9 @@ def generate_answer(input_request, search_results):
                                     "notation. Only "
                                     "cite the most relevant result that answer the question "
                                     "accurately. If different results refer to different entities with the same "
-                                    "name, write separate answers for each entity."},
+                                    "name, write separate answers for each entity."
+                                    "Make a correct answer without literally describing the search results, "
+                                    "avoid using 'based on the provided search results', 'in summary', 'overall' "},
         {"role": "assistant", "content": f"{input_request}"},
         {"role": "user", "content": f"{json.dumps(search_results)}"}
     ]
