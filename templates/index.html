@@ -18,22 +18,26 @@
             vaccines successful? What are the limitations of Bibliometrics? Is smoking a cause for asthma?</i>
         <div class="disclaimer">
             <ul>
-                <li> This is an internal version of CORE-GPT. The final version will be integrated on <a href="https://core.ac.uk">the CORE website</a> alongside the usual search.
+                <li> This is an internal version of CORE-GPT. The final version will be integrated on <a
+                        href="https://core.ac.uk">the CORE website</a> alongside the usual search.
                 </li>
-                <li> We use OpenAI CHAT-GPT 4 to search the CORE dataset and then generate an answer using the search
-                    results as context.
+                <li> We use Azure AI Foundry to search the CORE dataset and generate an answer grounded in the
+                    search results as context.
                 </li>
-                <li>We reduce the hallucinations by asking Chat-GPT to stick to the CORE search results, however,
+                <li>We reduce hallucinations by constraining the model to the CORE search results only, however,
                     hallucinations are still possible, especially when there are not enough relevant results from CORE.
                 </li>
-                <li>The quality of the answers depends on what we can find in the CORE data, you are searching through nearly 300 million
-                    Open Access research papers (<a href="https://core.ac.uk/data">see the data page</a> for details), therefore you will get a better quality answer if you inquire about an
+                <li>The quality of the answers depends on what we can find in the CORE data, you are searching through
+                    nearly 300 million
+                    Open Access research papers (<a href="https://core.ac.uk/data">see the data page</a> for details),
+                    therefore you will get a better quality answer if you inquire about an
                     academic topic rather than asking for a recipe.
                 </li>
                 <li>Sometimes the CORE search results are not able to provide an answer and usually Core GPT will
                     recognise that.
                 </li>
-                <li>The results are generated every time, so if you don’t like the answer you can try to click 'ask again'
+                <li>The results are generated every time, so if you don’t like the answer you can try to click 'ask
+                    again'
                     to see if you will get a better response.
                 </li>
                 <li>This is just a small answer to your question while there's way more research to explore! We
@@ -45,6 +49,7 @@
     </div>
 </main>
 <script>
+    let conversation = [];
 
     document.addEventListener("keydown", function (e) {
         if (e.keyCode === 13) {
@@ -52,22 +57,49 @@
         }
     });
 
-
     function doSearch() {
-        let q = document.getElementById("q").value;
-        console.log("search " + q)
-        const params = {
-            q: q
-        };
+        let q = document.getElementById("q").value.trim();
+        if (!q) {
+            return;
+        }
         document.getElementById("loading").style.display = "block";
         document.getElementById("q").value = "Searching...";
-        fetch('ask?q=' + q)
-            .then(response => response.text())
+
+        fetch('/chat', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({message: q, messages: conversation})
+        })
+            .then(response => response.json())
             .then(data => {
+                conversation = data.messages || conversation;
+                const answerHtml = data.action === "search"
+                    ? formatSearchResponse(data)
+                    : escapeHtml(data.message);
+
                 document.getElementById("q").value = "";
-                document.getElementById("loading").style.display = "none"
-                document.getElementById("answerBox").innerHTML = "<div class='question'>" + capitalizeFirstLetter(q) + "<a class='repeatLink' href='#' onclick='repeatSearch(\"" + q + "\")'>Ask again</a> </div><div class='answer lineUp'>" + data + "</div>" + document.getElementById("answerBox").innerHTML;
+                document.getElementById("loading").style.display = "none";
+                document.getElementById("answerBox").innerHTML =
+                    "<div class='question'>" + escapeHtml(capitalizeFirstLetter(q)) +
+                    "<a class='repeatLink' href='#' onclick='repeatSearch(\"" + escapeAttr(q) + "\")'>Ask again</a></div>" +
+                    "<div class='answer lineUp'>" + answerHtml + "</div>" +
+                    document.getElementById("answerBox").innerHTML;
             });
+    }
+
+    function formatSearchResponse(data) {
+        let html = escapeHtml(data.answer || data.message || "");
+        if (data.results) {
+            const listItems =  Object.values(data.results).map(link => {
+                return `<li><a href="${link.url}" target="_blank" rel="noopener noreferrer">${link.title}</a></li>`;
+            });
+            // 2. Join the items together and wrap in an <ol> tag
+            html+= `<ol>\n${listItems.join('\n')}\n</ol>`;
+        }
+        if (data.see_more) {
+            html += "<br><a href='" + escapeAttr(data.see_more) + "' target='_blank'>See more in CORE</a>";
+        }
+        return html;
     }
 
     function repeatSearch(q) {
@@ -79,6 +111,15 @@
         return string.charAt(0).toUpperCase() + string.slice(1);
     }
 
+    function escapeHtml(text) {
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+    }
 
+    function escapeAttr(text) {
+        return text.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+    }
 </script>
 </body>

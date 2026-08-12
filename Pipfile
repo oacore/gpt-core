@@ -9,9 +9,9 @@ requests = "*"
 python-dateutil = "*"
 flask = "*"
 waitress = "*"
+dotenv = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.9"
-python_full_version = "3.9.1"
+python_version = "3.12"
