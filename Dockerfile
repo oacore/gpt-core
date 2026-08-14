@@ -15,4 +15,4 @@ RUN pipenv install --system --deploy --ignore-pipfile
 # Copy your application code
 # Run the Python command directly
 
-CMD python -m src.main
+CMD python main.py

@@ -1,0 +1,55 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: core-frontend-gpt-core
+  namespace: core-frontend
+spec:
+  parentRefs:
+    - name: public-gateway
+      namespace: gateway-system
+  hostnames:
+    - core.ac.uk
+  rules:
+    # Chat API call from the page (templates/index.html fetches POST /chat as an
+    # absolute path) — forward unchanged, no prefix to strip.
+    - matches:
+        - path:
+            type: Exact
+            value: /chat
+          method: POST
+      timeouts:
+        request: 30s
+        backendRequest: 15s
+      backendRefs:
+        - name: core-frontend-gpt-core
+          port: 80
+    # Static assets, referenced relative to the page (static/css/..., static/images/...),
+    # resolve to /static/* regardless of how the page itself was reached.
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /static
+      timeouts:
+        request: 30s
+        backendRequest: 15s
+      backendRefs:
+        - name: core-frontend-gpt-core
+          port: 80
+    # Everything else under /chat (the page itself, /chat/ask, ...) — strip the
+    # /chat mount prefix so it lands on the app's own root-relative routes.
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /chat
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
+      timeouts:
+        request: 30s
+        backendRequest: 15s
+      backendRefs:
+        - name: core-frontend-gpt-core
+          port: 80
