@@ -4,12 +4,12 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-openai = "*"
+openai = "<3.0"
 requests = "*"
 python-dateutil = "*"
 flask = "*"
 waitress = "*"
-dotenv = "*"
+python-dotenv = "*"
 
 [dev-packages]
 
